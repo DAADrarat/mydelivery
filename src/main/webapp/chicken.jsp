@@ -85,7 +85,7 @@
         <h2 class="fw-bold text-dark">${not empty menu.menuName ? menu.menuName : '바삭 바삭 치킨'}</h2>
         <p class="text-muted mb-2">겉은 바삭하고 속은 촉촉한 치킨입니다.</p>
         <h4 class="text-primary fw-bold mb-4">
-            기본 가격: <span id="basePrice">${not empty menu.price ? menu.price : 20000}</span>원
+            기본 가격: <span id="basePrice">${not empty menu.price ? menu.price : 23000}</span>원
         </h4>
 
         <form id="orderForm">
@@ -148,7 +148,7 @@
 
             <div class="total-price-box text-center mb-4">
                 <span class="fs-5 text-dark">총 주문 금액: </span>
-                <span id="totalPriceDisplay" class="fs-3 fw-bold text-danger">20,000</span>
+                <span id="totalPriceDisplay" class="fs-3 fw-bold text-danger">23,000</span>
                 <span class="fs-5 text-dark">원</span>
             </div>
 
