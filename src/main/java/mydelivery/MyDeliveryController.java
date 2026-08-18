@@ -56,23 +56,27 @@ public class MyDeliveryController extends HttpServlet {
 		}
 
 		case "/menu.do": {
-		    page = "menu_choice1.jsp";
-		    break;
-		}
-		case "/chicken.do": {
-			page = "chicken.jsp";
-			break;
-		}
-		case "/pizza.do": {
-			page = "menuPizza.jsp";
-			break;
-		}
-		case "/Dduck.do": {
-			page = "menuDduck.jsp";
+			page = "menu_choice1.jsp";
 			break;
 		}
 		case "/gukbap.do": {
+			req.setAttribute("menu", new DeliveryDAO().getMenuDetail(1));
 			page = "gukbap.jsp";
+			break;
+		}
+		case "/pizza.do": {
+			req.setAttribute("menu", new DeliveryDAO().getMenuDetail(2));
+			page = "menuPizza.jsp";
+			break;
+		}
+		case "/chicken.do": {
+			req.setAttribute("menu", new DeliveryDAO().getMenuDetail(3));
+			page = "chicken.jsp";
+			break;
+		}
+		case "/Dduck.do": {
+			req.setAttribute("menu", new DeliveryDAO().getMenuDetail(4));
+			page = "menuDduck.jsp";
 			break;
 		}
 
@@ -97,23 +101,43 @@ public class MyDeliveryController extends HttpServlet {
 			break;
 		}
 		case "/addcart.do": {
-			// 1. client가 보내준 menuId를 꺼내온다.
-			String menuIdStr = req.getParameter("menuId");
 			int menuId = 0;
-			if (menuIdStr != null)
-				menuId = Integer.parseInt(menuIdStr);
-			// MenuTO menu = MenuDAO.getById(menuId);
-			// 3. 세션의 장바구니 리스트에 담는다. (CartTO 없이 MenuTO 그대로 사용)
+			String s = req.getParameter("menuId");
+			if (s != null)
+				menuId = Integer.parseInt(s);
+
+			String selectedOptions = req.getParameter("selectedOptions");
+			int finalPrice = 0;
+			String fp = req.getParameter("finalPrice");
+			if (fp != null)
+				finalPrice = Integer.parseInt(fp);
+
+			DeliveryDAO dao = new DeliveryDAO();
+			MenuTO menu = dao.getMenuDetail(menuId);
+			
+			System.out.println(">>> menuId=" + menuId + " / menu=" + menu + " / opt=" + selectedOptions);
+
 			HttpSession session = req.getSession();
-			List<MenuTO> cart = (List<MenuTO>) session.getAttribute("cart"); // (List<MenuTO>):뒤에게 object라 형변환
-			if (cart == null) {
+			List<MenuTO> cart = (List<MenuTO>) session.getAttribute("cart");
+			if (cart == null)
 				cart = new ArrayList<>();
+
+			if (menu != null) {
+				menu.setQty(1);
+				menu.setOptionText(selectedOptions);
+				if (finalPrice > 0)
+					menu.setPrice(finalPrice);
+				cart.add(menu);
 			}
-			// cart.add(menu); 앞에서 가져온 menuto menu를 cart에 넣는것
+			System.out.println(">>> cart 크기=" + cart.size());
+			
 			session.setAttribute("cart", cart);
-			req.setAttribute("cartList", cart); // 이건 세션에서 저장한 장바구니를 이번 요청에서 cart.jsp가 사용할 수 있도록 request에도 넣는것
+			setCartAttr(req, cart);
 			page = "cart.jsp";
 			break;
+		
+			
+
 		}
 		case "/cart.do": {
 			// 1. 세션에서 장바구니 리스트를 꺼내온다.
@@ -122,7 +146,7 @@ public class MyDeliveryController extends HttpServlet {
 			if (cart == null) {
 				cart = new ArrayList<>();
 			}
-			req.setAttribute("cartList", cart);
+			setCartAttr(req, cart);  
 			page = "cart.jsp";
 			break;
 		}
@@ -149,10 +173,12 @@ public class MyDeliveryController extends HttpServlet {
 			HttpSession session = req.getSession();
 			List<MenuTO> cart = (List<MenuTO>) session.getAttribute("cart");
 			if (cart != null) {
-				// ??? menuId 기준으로 제거하는 로직 필요 (예: removeIf) ???
-				// cart.removeIf(m -> m.getMenu_id() == menuId);
+				final int delId = menuId;
+				cart.removeIf(m -> m.getMenuId() == delId);
+			} else {
+				cart = new ArrayList<>();
 			}
-			req.setAttribute("cartList", cart);
+			setCartAttr(req, cart);
 			page = "cart.jsp";
 			break;
 		}
@@ -213,6 +239,14 @@ public class MyDeliveryController extends HttpServlet {
 		order.setOrderTime(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date()));
 
 		return order;
+	}
+
+	void setCartAttr(HttpServletRequest req, List<MenuTO> cart) {
+		int total = 0;
+		for (MenuTO m : cart)
+			total += m.getItemTotal();
+		req.setAttribute("list", cart);
+		req.setAttribute("total", total);
 	}
 
 }

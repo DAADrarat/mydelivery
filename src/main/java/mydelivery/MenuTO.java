@@ -52,4 +52,14 @@ public class MenuTO {
 	public int getItemTotal() {
 		return price * qty;
 	}
+	
+	private String optionText;
+
+	public String getOptionText() {
+	    return optionText;
+	}
+
+	public void setOptionText(String optionText) {
+	    this.optionText = optionText;
+	}
 }

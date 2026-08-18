@@ -3,29 +3,6 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-<%
-	// ===== 화면 확인용 더미데이터 (컨트롤러 완성되면 이 블록 삭제) =====
-	List<Map<String, Object>> dummy = new ArrayList<>();
-	String[] names = { "페퍼로니 피자", "치즈 피자", "콜라 1.25L" };
-	int[] prices = { 21000, 19000, 3000 };
-	int[] qtys = { 1, 2, 3 };
-
-	int sum = 0;
-	for (int i = 0; i < names.length; i++) {
-		Map<String, Object> m = new HashMap<>();
-		m.put("menuId", i + 1);
-		m.put("menuName", names[i]);
-		m.put("unitPrice", prices[i]);
-		m.put("qty", qtys[i]);
-		m.put("itemTotal", prices[i] * qtys[i]);
-		m.put("optionText", "");
-		dummy.add(m);
-		sum += prices[i] * qtys[i];
-	}
-	request.setAttribute("list", dummy);
-	request.setAttribute("total", sum);
-	// ===== 여기까지 삭제 =====
-%>
 
 <!DOCTYPE html>
 <html>

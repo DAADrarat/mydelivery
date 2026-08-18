@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -26,7 +26,7 @@
 <nav class="navbar navbar-dark bg-warning mb-4">
     <div class="container-fluid">
         <span class="navbar-brand mb-0 h1 text-dark fw-bold">🍕 피자</span>
-        <a href="store.jsp" class="btn btn-outline-dark btn-sm">메뉴 목록으로</a>
+        <a href="store.do" class="btn btn-outline-dark btn-sm">메뉴 목록으로</a>
     </div>
 </nav>
 
@@ -215,10 +215,12 @@ $(document).ready(function() {
                 finalPrice: finalPrice
             },
             success: function(response) {
-                location.href = "cart.jsp";
+                if (confirm("장바구니에 메뉴가 성공적으로 담겼습니다!\n장바구니(주문 화면)로 이동하시겠습니까?")) {
+                    location.href = "cart.do";
+                }
             },
             error: function() {
-                location.href = "cart.jsp";
+                alert("장바구니 담기 중 오류가 발생했습니다.");
             }
         });
     });

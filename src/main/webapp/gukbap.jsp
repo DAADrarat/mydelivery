@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -140,13 +140,14 @@ $(document).ready(function() {
                 finalPrice: finalPrice
             },
             success: function(response) {
-                location.href = "cart.jsp";
+                if (confirm("장바구니에 메뉴가 성공적으로 담겼습니다!\n장바구니(주문 화면)로 이동하시겠습니까?")) {
+                    location.href = "cart.do";
+                }
             },
             error: function() {
-                location.href = "cart.jsp";
+                alert("장바구니 담기 중 오류가 발생했습니다.");
             }
         });
-    });
 });
 </script>
 </body>

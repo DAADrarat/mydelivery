@@ -39,7 +39,7 @@
 <nav class="navbar navbar-dark bg-warning mb-4">
     <div class="container-fluid">
         <span class="navbar-brand mb-0 h1 text-dark fw-bold">🍗 치킨</span>
-        <a href="store.jsp" class="btn btn-outline-dark btn-sm">메뉴 목록으로</a>
+        <a href="menu_choice1.jsp" class="btn btn-outline-dark btn-sm">메뉴 목록으로</a>
     </div>
 </nav>
 
@@ -213,9 +213,8 @@ $(document).ready(function() {
         let selectedOptions = getSelectedOptionString();
         let menuId = $("input[name='menuId']").val();
 
-
         $.ajax({
-            url: "cartAdd.do",
+            url: "addcart.do",
             type: "POST",
             data: {
                 menuId: menuId,
@@ -224,7 +223,7 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (confirm("장바구니에 메뉴가 성공적으로 담겼습니다!\n장바구니(주문 화면)로 이동하시겠습니까?")) {
-                    location.href = "order.jsp";
+                    location.href = "cart.do";
                 }
             },
             error: function() {
