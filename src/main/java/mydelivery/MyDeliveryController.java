@@ -17,10 +17,14 @@ public class MyDeliveryController extends HttpServlet {
 
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		req.setCharacterEncoding("UTF-8");
 		String page = "index.jsp";
 		String uri = req.getRequestURI(); // http://localhost:8080/empapp/list.do
 		String requestUri = uri.substring(uri.lastIndexOf("/"), uri.length());
 		System.out.println("requestUri=" + requestUri);
+		
+		DeliveryDAO menuDAO = new DeliveryDAO();
+
 		switch (requestUri) {
 
 		case "/loginform.do": {
@@ -32,13 +36,11 @@ public class MyDeliveryController extends HttpServlet {
 			String customerId = req.getParameter("customerId");
 			String customerPw = req.getParameter("customerPw");
 
-			DeliveryDAO menuDAO = new DeliveryDAO();
 			CustomerTO customerTO = menuDAO.login(customerId, customerPw);
 
 			if (customerTO != null) {
 				HttpSession session = req.getSession();
 				session.setAttribute("customer", customerTO);
-
 				page = "menu_choice1.jsp";
 			} else {
 				req.setAttribute("msg", "아이디 또는 비밀번호가 일치하지 않습니다.");
@@ -47,143 +49,155 @@ public class MyDeliveryController extends HttpServlet {
 			break;
 		}
 		case "/logout.do": {
-			HttpSession session = req.getSession(false); // =req.getSession(false): 세션이 이미 있으면 가져오고 없으면 null
+			HttpSession session = req.getSession(false); // 세션이 이미 있으면 가져오고 없으면 null
 			if (session != null)
-				session.invalidate(); // session이 존재한다면 session을 삭제해라
+				session.invalidate(); // session이 존재한다면 삭제
 			page = "login.jsp";
-
 			break;
 		}
 
-		case "/menu.do": {
-		    page = "menu_choice1.jsp";
-		    break;
+		case "/menu.do": 
+		case "/store.do": {
+			page = "menu_choice1.jsp";
+			break;
 		}
 		case "/chicken.do": {
+			req.setAttribute("menu", menuDAO.getMenuDetail(3));
 			page = "chicken.jsp";
 			break;
 		}
 		case "/pizza.do": {
+			req.setAttribute("menu", menuDAO.getMenuDetail(2));
 			page = "menuPizza.jsp";
 			break;
 		}
-		case "/Dduck.do": {
+		case "/Dduck.do": 
+		 {
+			req.setAttribute("menu", menuDAO.getMenuDetail(4));
 			page = "menuDduck.jsp";
 			break;
 		}
 		case "/gukbap.do": {
+			req.setAttribute("menu", menuDAO.getMenuDetail(1));
 			page = "gukbap.jsp";
 			break;
 		}
 
-		case "/store.do": {
-			// List<MenuTO> list = MenuDAO.getList(); menuto객체를 여러개 담는 List 컨트롤러가 menudao에게
-			// 메뉴 목록을 가져오라고 요청하는거
-			// req.setAttribute("data", list); jsp로 전달하는 역할, request객체에 data라는 이름으로 list를 저장
-			page = "menu_choice1.jsp";
+		// ===== 장바구니 담기 (CartTO 없이 MenuTO 그대로 사용) =====
+		case "/addcart.do": 
+		case "/cartAdd.do": {
+			// 1. client가 보내준 데이터를 꺼내온다.
+			int menuId = Integer.parseInt(req.getParameter("menuId"));
+			String selectedOptions = req.getParameter("selectedOptions");
+			int finalPrice = Integer.parseInt(req.getParameter("finalPrice"));
+			
+			int qty = 1;
+			if(req.getParameter("quantity") != null) {
+				qty = Integer.parseInt(req.getParameter("quantity"));
+			}
+
+			// 2. DB에서 해당 메뉴 조회
+			MenuTO menu = menuDAO.getMenuDetail(menuId);
+			
+			if (menu != null) {
+				// MenuTO에 장바구니 옵션과 금액을 채워넣음
+				menu.setOptionText(selectedOptions);
+				menu.setQty(qty);
+				menu.setItemTotal(finalPrice);
+				
+				// 장바구니 내 고유 구분을 위해 메뉴ID 살짝 변경 (중복 담기 방지)
+				menu.setMenuId(menuId * 1000 + (int)(Math.random() * 999));
+				
+				// 3. 세션의 장바구니 리스트에 담는다.
+				HttpSession session = req.getSession();
+				
+				List<MenuTO> cart = (List<MenuTO>) session.getAttribute("cart"); 
+				if (cart == null) {
+					cart = new ArrayList<>();
+				}
+				cart.add(menu);
+				session.setAttribute("cart", cart);
+			}
+			
+			// 화면 이동 대신 통신 성공 응답만 반환
+			resp.getWriter().print("success");
+			return; 
+		}
+
+		case "/cart.do": {
+			String cmd = req.getParameter("cmd");
+			HttpSession session = req.getSession();
+			List<MenuTO> cart = (List<MenuTO>) session.getAttribute("cart");
+			if (cart == null) cart = new ArrayList<>();
+			
+			// 🛒 수량 업데이트 및 삭제 (AJAX 비동기 처리)
+			if ("update".equals(cmd) || "delete".equals(cmd)) {
+				int menuId = Integer.parseInt(req.getParameter("menuId"));
+				int qty = "update".equals(cmd) ? Integer.parseInt(req.getParameter("qty")) : 0;
+				
+				boolean removed = false;
+				int itemTotal = 0;
+				int grandTotal = 0;
+				
+				for (int i = 0; i < cart.size(); i++) {
+					MenuTO m = cart.get(i);
+					if (m.getMenuId() == menuId) {
+						if (qty <= 0) {
+							cart.remove(i);
+							removed = true;
+							i--; 
+						} else {
+							int unitPrice = m.getItemTotal() / m.getQty(); // 1개당 단가 역산
+							m.setQty(qty);
+							m.setItemTotal(unitPrice * qty);
+							itemTotal = m.getItemTotal();
+						}
+					}
+				}
+				for (MenuTO m : cart) grandTotal += m.getItemTotal();
+				
+				boolean empty = cart.isEmpty();
+				String json = String.format("{\"removed\": %b, \"qty\": %d, \"itemTotal\": %d, \"total\": %d, \"empty\": %b}", 
+						removed, qty, itemTotal, grandTotal, empty);
+				
+				resp.setContentType("application/json;charset=UTF-8");
+				resp.getWriter().print(json);
+				return;
+				
+			} else {
+				// 🛒 단순 장바구니 화면 이동
+				int total = 0;
+				for (MenuTO m : cart) total += m.getItemTotal();
+				
+				req.setAttribute("list", cart); // JSP에 보낼 장바구니 리스트
+				req.setAttribute("total", total);
+				page = "cart.jsp";
+			}
 			break;
 		}
 
-		case "/optionform.do": {
-			// 1. client가 보내준 menuId를 꺼내온다.
-			String menuIdStr = req.getParameter("menuId");
-			int menuId = 0;
-			if (menuIdStr != null)
-				menuId = Integer.parseInt(menuIdStr);
-			// MenuTO menu = MenuDAO.getById(menuId); 내가 받은 메뉴가 3번이다 그럼 3번 메뉴를 다오에서 찾아줘
-			// req.setAttribute("menu", menu);
-			// 3. 옵션 선택 폼으로 포워딩한다.
-			page = "option_form.jsp"; // 여기서 request객체에 저장해놓은 menu를 사용할 수 있다.
-			break;
-		}
-		case "/addcart.do": {
-			// 1. client가 보내준 menuId를 꺼내온다.
-			String menuIdStr = req.getParameter("menuId");
-			int menuId = 0;
-			if (menuIdStr != null)
-				menuId = Integer.parseInt(menuIdStr);
-			// MenuTO menu = MenuDAO.getById(menuId);
-			// 3. 세션의 장바구니 리스트에 담는다. (CartTO 없이 MenuTO 그대로 사용)
-			HttpSession session = req.getSession();
-			List<MenuTO> cart = (List<MenuTO>) session.getAttribute("cart"); // (List<MenuTO>):뒤에게 object라 형변환
-			if (cart == null) {
-				cart = new ArrayList<>();
-			}
-			// cart.add(menu); 앞에서 가져온 menuto menu를 cart에 넣는것
-			session.setAttribute("cart", cart);
-			req.setAttribute("cartList", cart); // 이건 세션에서 저장한 장바구니를 이번 요청에서 cart.jsp가 사용할 수 있도록 request에도 넣는것
-			page = "cart.jsp";
-			break;
-		}
-		case "/cart.do": {
-			// 1. 세션에서 장바구니 리스트를 꺼내온다.
-			HttpSession session = req.getSession();
-			List<MenuTO> cart = (List<MenuTO>) session.getAttribute("cart");
-			if (cart == null) {
-				cart = new ArrayList<>();
-			}
-			req.setAttribute("cartList", cart);
-			page = "cart.jsp";
-			break;
-		}
-		case "/editcart.do": {
-			// 1. client가 보내준 menuId(수정할 항목)를 꺼내온다.
-			String menuIdStr = req.getParameter("menuId");
-			int menuId = 0;
-			if (menuIdStr != null)
-				menuId = Integer.parseInt(menuIdStr);
-			// 2. DB에서 해당 메뉴를 조회해서 옵션 선택 화면에 다시 넘긴다.
-			// ??? MenuDAO.getById(menuId) 확인 필요 ???
-			// MenuTO menu = MenuDAO.getById(menuId);
-			// req.setAttribute("menu", menu);
-			page = "option_form.jsp";
-			break;
-		}
-		case "/deletecart.do": {
-			// 1. client가 보내준 삭제할 항목의 menuId를 꺼내온다.
-			String menuIdStr = req.getParameter("menuId");
-			int menuId = 0;
-			if (menuIdStr != null)
-				menuId = Integer.parseInt(menuIdStr);
-			// 2. 세션의 장바구니 리스트에서 해당 항목을 제거한다.
-			HttpSession session = req.getSession();
-			List<MenuTO> cart = (List<MenuTO>) session.getAttribute("cart");
-			if (cart != null) {
-				// ??? menuId 기준으로 제거하는 로직 필요 (예: removeIf) ???
-				// cart.removeIf(m -> m.getMenu_id() == menuId);
-			}
-			req.setAttribute("cartList", cart);
-			page = "cart.jsp";
-			break;
-		}
-		case "/payform.do": {
-			// 1. 세션에서 장바구니 리스트를 꺼내온다.
-			HttpSession session = req.getSession();
-			List<MenuTO> cart = (List<MenuTO>) session.getAttribute("cart");
-			req.setAttribute("cartList", cart);
-			// ??? 총액 계산 로직 필요 (price 합산) ???
-			page = "pay_form.jsp";
-			break;
-		}
 		case "/order.do": {
 			// 1. 세션에서 고객 정보와 장바구니를 꺼낸다.
 			HttpSession session = req.getSession();
-			CustomerTO customerTO = (CustomerTO) session.getAttribute("customer");
+			CustomerTO customerTO = (CustomerTO) session.getAttribute("customer");		
 			List<MenuTO> cart = (List<MenuTO>) session.getAttribute("cart");
-			// 2. 주문 객체를 만들어 DB에 저장한다.
-			OrderTO order = makeOrder(req, customerTO, cart);
-			System.out.println(order);
-			// ??? OrderDAO 확인 필요 ???
-			// OrderDAO.insert(order);
-			// 3. 장바구니를 비운다.
-			session.removeAttribute("cart");
+			
+			if (customerTO != null && cart != null && !cart.isEmpty()) {
+				// 2. 주문 객체를 만들어 DB에 저장한다.
+				OrderTO order = makeOrder(req, customerTO, cart);
+				menuDAO.insertOrder(order);
+				
+				// 완료 화면(order.jsp)을 위한 값 전달
+				int total = 0;
+				for (MenuTO m : cart) total += m.getItemTotal();
+				req.setAttribute("list", cart);
+				req.setAttribute("total", total);
+				
+				// 3. 장바구니를 비운다.
+				session.removeAttribute("cart");
+			}
 			page = "order.jsp";
 			break;
-
-			// Controller 내부의 주문 처리 부분 예시 MenuDAO menuDAO = new MenuDAO();
-			// int result = menuDAO.insertOrder(order); if (result > 0)
-			// { // result가 1이면 DB 저장 성공! // 주문 완료 화면으로 이동 page = "orderResult.jsp"; }
-			// else { // result가 0이면 저장 실패 // 실패 메시지를 띄우거나 이전 화면으로 돌아감 }
 		}
 		default:
 		}
@@ -194,25 +208,32 @@ public class MyDeliveryController extends HttpServlet {
 	OrderTO makeOrder(HttpServletRequest req, CustomerTO customer, List<MenuTO> cart) {
 		OrderTO order = new OrderTO();
 		if (customer != null) {
-
+			order.setCustomerNumber(customer.getCustomerId()); 
 			order.setCustomerName(customer.getCustomerName());
 			order.setCustomerAddress(customer.getCustomerAddress());
 			order.setCustomerPhone(customer.getCustomerPhone());
 		}
-		// ??? 장바구니(cart)를 돌면서 selectedOptions, finalPrice 채우는 로직 필요 ???
-		// 예: cart가 여러 개면 selectedOptions는 메뉴 이름들을 이어붙이고, finalPrice는 price 합산
-		// StringBuilder sb = new StringBuilder();
-		// int total = 0;
-		// for (MenuTO menu : cart) {
-		// sb.append(menu.getMenu_name()).append(",");
-		// total += menu.getPrice();
-		// }
-		// order.setSelectedOptions(sb.toString());
-		// order.setFinalPrice(total);
-
+		
+		// 장바구니(cart)를 돌면서 selectedOptions, finalPrice 채우는 로직
+		StringBuilder sb = new StringBuilder();
+		int total = 0;
+		
+		if (cart != null && !cart.isEmpty()) {
+			int rawMenuId = cart.get(0).getMenuId() / 1000;
+			order.setMenuId(rawMenuId > 0 ? rawMenuId : 1);
+			
+			for (int i = 0; i < cart.size(); i++) {
+				MenuTO menu = cart.get(i);
+				sb.append(menu.getMenuName()).append("(").append(menu.getOptionText()).append(")");
+				if (i < cart.size() - 1) sb.append(", ");
+				total += menu.getItemTotal();
+			}
+		}
+		
+		order.setSelectedOptions(sb.toString());
+		order.setFinalPrice(total);
 		order.setOrderTime(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date()));
 
 		return order;
 	}
-
 }

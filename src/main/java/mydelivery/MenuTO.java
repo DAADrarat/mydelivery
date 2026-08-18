@@ -52,4 +52,14 @@ public class MenuTO {
 	public int getItemTotal() {
 		return price * qty;
 	}
+
+	public void setItemTotal(int i) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public Object getOptionText() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
