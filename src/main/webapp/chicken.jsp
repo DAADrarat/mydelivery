@@ -39,7 +39,7 @@
 <nav class="navbar navbar-dark bg-warning mb-4">
     <div class="container-fluid">
         <span class="navbar-brand mb-0 h1 text-dark fw-bold">🍗 치킨</span>
-        <a href="store.jsp" class="btn btn-outline-dark btn-sm">메뉴 목록으로</a>
+        <a href="menu_choice1.jsp" class="btn btn-outline-dark btn-sm">메뉴 목록으로</a>
     </div>
 </nav>
 

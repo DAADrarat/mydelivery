@@ -15,8 +15,6 @@ integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="ano
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
-<body> 
-<h1>안녕하세요</h1>
 <body>
 
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">

@@ -24,7 +24,7 @@
 <nav class="navbar navbar-dark bg-warning mb-4">
     <div class="container-fluid">
         <span class="navbar-brand mb-0 h1 text-dark fw-bold">🍲 국밥</span>
-        <a href="store.jsp" class="btn btn-outline-dark btn-sm">메뉴 목록으로</a>
+        <a href="menu_choice1.jsp" class="btn btn-outline-dark btn-sm">메뉴 목록으로</a>
     </div>
 </nav>
 
@@ -34,7 +34,7 @@
         <div id="gukbapCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
             <div class="carousel-inner">
                 <div class="carousel-item active">
-                    <img src="https://www.daangn.com/kr/local-profile/%EC%98%A8%EC%A0%95%EA%B5%AD%EB%B0%A5-abnrk9jerqpg/" class="d-block w-100" alt="국밥">
+                    <img src="https://img.kr.gcp-karroter.net/businessPlatform/bizPlatform/profile/center_biz_13352771/1752554841110/59393ba594448ca74f669168c83f7258be9bca344310d68904b83e7565b6ef5e.jpeg?q=95&s=1440x1440&t=inside&service=business-profile" class="d-block w-100" alt="국밥">
                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
                         <h5>뜨끈한 국밥</h5>
                     </div>
