@@ -15,10 +15,8 @@ integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="ano
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
-<<<<<<< HEAD
 <body> 
 <h1>안녕하세요</h1>
-=======
 <body>
 
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
@@ -53,7 +51,7 @@ integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="ano
                         <span class="input-group-text bg-white border-end-0" style="border-radius: 12px 0 0 12px;">
                             <i class="bi bi-lock"></i>
                         </span>
-                        <input type="password" name="customerpw" class="form-control border-start-0" style="border-radius: 0 12px 12px 0;" required>
+                        <input type="password" name="customerPw" class="form-control border-start-0" style="border-radius: 0 12px 12px 0;" required>
                     </div>
                 </div>
                 <button type="submit" class="btn btn-delivery w-100">

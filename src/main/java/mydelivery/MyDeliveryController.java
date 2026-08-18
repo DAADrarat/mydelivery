@@ -39,7 +39,7 @@ protected void service(HttpServletRequest req, HttpServletResponse resp) throws 
 			        HttpSession session = req.getSession();
 			        session.setAttribute("customer", customerTO);
 			        
-			        page = "store.jsp"; 
+			        page = "menu_choice1.jsp"; 
 			    } else {
 			        req.setAttribute("msg", "아이디 또는 비밀번호가 일치하지 않습니다.");
 			        page = "login.jsp";
@@ -57,7 +57,7 @@ protected void service(HttpServletRequest req, HttpServletResponse resp) throws 
 			case"/store.do" : {
 				//List<MenuTO> list = MenuDAO.getList(); menuto객체를 여러개 담는 List 컨트롤러가 menudao에게 메뉴 목록을 가져오라고 요청하는거
 				//req.setAttribute("data", list); jsp로 전달하는 역할, request객체에 data라는 이름으로 list를 저장
-				page = "store.jsp";
+				page = "menu_choice1.jsp";
 				break;
 			}
 			
