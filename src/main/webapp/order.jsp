@@ -3,29 +3,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-<%
-	// ===== 화면 확인용 더미데이터 (컨트롤러 완성되면 이 블록 삭제) =====
-	List<Map<String, Object>> dummy = new ArrayList<>();
-	String[] names = { "페퍼로니 피자", "콜라 1.25L" };
-	String[] opts  = { "라지 / 치즈크러스트 / 감자추가", "" };
-	int[] totals   = { 65000, 3000 };
-	int[] qtys     = { 2, 1 };
 
-	int sum = 0;
-	for (int i = 0; i < names.length; i++) {
-		Map<String, Object> m = new HashMap<>();
-		m.put("menuName", names[i]);
-		m.put("optionText", opts[i]);
-		m.put("qty", qtys[i]);
-		m.put("itemTotal", totals[i]);
-		dummy.add(m);
-		sum += totals[i];
-	}
-	request.setAttribute("list", dummy);
-	request.setAttribute("total", sum);
-	request.setAttribute("orderNo", 1024);
-	// ===== 여기까지 삭제 =====
-%>
 
 <!DOCTYPE html>
 <html>
@@ -67,8 +45,7 @@
 
 <nav class="navbar navbar-dark bg-warning mb-4">
     <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1 text-dark fw-bold">🍕 마이딜리버리</span>
-        <a href="store.jsp" class="btn btn-outline-dark btn-sm">처음으로</a>
+        <span class="navbar-brand mb-0 h1 text-dark fw-bold"> 마이딜리버리</span>
     </div>
 </nav>
 
@@ -112,12 +89,12 @@
 
   <div class="row g-2">
     <div class="col-6">
-      <a href="store.jsp" class="btn btn-outline-warning btn-lg w-100 fw-bold text-dark">
-        처음으로
+      <a href="login.jsp" class="btn btn-outline-warning btn-lg w-100 fw-bold text-dark">
+        로그아웃
       </a>
     </div>
     <div class="col-6">
-      <a href="menu.do?storeId=2" class="btn btn-warning btn-lg w-100 fw-bold text-dark">
+      <a href="menu.do?storeId=1" class="btn btn-warning btn-lg w-100 fw-bold text-dark">
         🍕 더 주문하기
       </a>
     </div>
