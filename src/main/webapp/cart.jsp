@@ -53,7 +53,7 @@
 <c:choose>
   <c:when test="${empty list}">
     <div class="text-center py-5">
-      <p class="text-muted fs-5 mb-4">장바구니가 비어있습니다.</p>
+      <p class="text-muted fs-5 mb-4">장바구니가 비어있습니다</p>
       <a href="menu.do" class="btn btn-warning fw-bold">메뉴 보러가기</a>
     </div>
   </c:when>
