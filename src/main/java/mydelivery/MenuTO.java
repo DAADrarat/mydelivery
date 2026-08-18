@@ -2,37 +2,54 @@ package mydelivery;
 
 public class MenuTO {
 
-	private int menu_id;
-	private int store_id;
-	private String menu_name;
+	private int menuId;
+	private int storeId;
+	private String menuName;
 	private int price;
-	
-	
-	
-	public int getMenu_id() {
-		return menu_id;
+	private int qty; // 장바구니용
+
+	public int getMenuId() {
+		return menuId;
 	}
-	public void setMenu_id(int menu_id) {
-		this.menu_id = menu_id;
+
+	public void setMenuId(int menuId) {
+		this.menuId = menuId;
 	}
-	public int getStore_id() {
-		return store_id;
+
+	public int getStoreId() {
+		return storeId;
 	}
-	public void setStore_id(int store_id) {
-		this.store_id = store_id;
+
+	public void setStoreId(int storeId) {
+		this.storeId = storeId;
 	}
-	public String getMenu_name() {
-		return menu_name;
+
+	public String getMenuName() {
+		return menuName;
 	}
-	public void setMenu_name(String menu_name) {
-		this.menu_name = menu_name;
+
+	public void setMenuName(String menuName) {
+		this.menuName = menuName;
 	}
+
 	public int getPrice() {
 		return price;
 	}
+
 	public void setPrice(int price) {
 		this.price = price;
 	}
 
-	
+	public int getQty() {
+		return qty;
+	}
+
+	public void setQty(int qty) {
+		this.qty = qty;
+	}
+
+	// 계산값
+	public int getItemTotal() {
+		return price * qty;
+	}
 }
