@@ -173,5 +173,54 @@ public class DeliveryDAO {
 
         return result;
     }
+    
+    //crud 항목추가
+ // 내 주문 목록 (Read)
+    public List<OrderTO> getOrderList(int customerNumber) {
+        List<OrderTO> list = new ArrayList<>();
+        String sql = "select * from orders where customer_number = ? order by order_id desc";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement psmt = conn.prepareStatement(sql)) {
+
+            psmt.setInt(1, customerNumber);
+            try (ResultSet rs = psmt.executeQuery()) {
+                while (rs.next()) {
+                    OrderTO to = new OrderTO();
+                    to.setOrderId(rs.getInt("order_id"));
+                    to.setMenuId(rs.getInt("menu_id"));
+                    to.setSelectedOptions(rs.getString("selected_options"));
+                    to.setFinalPrice(rs.getInt("final_price"));
+                    to.setOrderTime(rs.getString("order_time"));
+                    to.setCustomerName(rs.getString("customer_name"));
+                    to.setCustomerAddress(rs.getString("customer_address"));
+                    to.setCustomerPhone(rs.getString("customer_phone"));
+                    list.add(to);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // 배송지 수정 (Update) ★ 평가 항목
+    public int updateOrder(OrderTO order) {
+        int result = 0;
+        String sql = "update orders set customer_address = ?, customer_phone = ? where order_id = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement psmt = conn.prepareStatement(sql)) {
+
+        	psmt.setString(1, order.getCustomerAddress());
+        	psmt.setString(2, order.getCustomerPhone());
+        	psmt.setInt(3, order.getOrderId());
+        	
+            result = psmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 }
 

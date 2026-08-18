@@ -114,7 +114,7 @@ public class MyDeliveryController extends HttpServlet {
 
 			DeliveryDAO dao = new DeliveryDAO();
 			MenuTO menu = dao.getMenuDetail(menuId);
-			
+
 			System.out.println(">>> menuId=" + menuId + " / menu=" + menu + " / opt=" + selectedOptions);
 
 			HttpSession session = req.getSession();
@@ -130,23 +130,81 @@ public class MyDeliveryController extends HttpServlet {
 				cart.add(menu);
 			}
 			System.out.println(">>> cart 크기=" + cart.size());
-			
+
 			session.setAttribute("cart", cart);
 			setCartAttr(req, cart);
 			page = "cart.jsp";
 			break;
-		
-			
 
 		}
 		case "/cart.do": {
-			// 1. 세션에서 장바구니 리스트를 꺼내온다.
+			// 자바스크립트(AJAX)에서 보낸 cmd 파라미터 확인 (update 또는 delete)
+			String cmd = req.getParameter("cmd");
+
+			if (cmd != null) {
+				// 1. AJAX 요청일 경우 (JSON으로 응답을 내려줌)
+				resp.setContentType("application/json;charset=UTF-8");
+				int menuId = Integer.parseInt(req.getParameter("menuId"));
+
+				HttpSession session = req.getSession();
+				List<MenuTO> cart = (List<MenuTO>) session.getAttribute("cart");
+				if (cart == null)
+					cart = new ArrayList<>();
+
+				boolean removed = false;
+				int newQty = 0;
+				int itemTotal = 0;
+
+				if ("update".equals(cmd)) {
+					// 수량 변경 로직
+					int qty = Integer.parseInt(req.getParameter("qty"));
+					for (int i = 0; i < cart.size(); i++) {
+						MenuTO m = cart.get(i);
+						if (m.getMenuId() == menuId) {
+							if (qty <= 0) {
+								cart.remove(i);
+								removed = true;
+							} else {
+								m.setQty(qty);
+								newQty = m.getQty();
+								itemTotal = m.getItemTotal(); // 단일 메뉴 총액 갱신
+							}
+							break;
+						}
+					}
+				} else if ("delete".equals(cmd)) {
+					// 삭제 로직
+					cart.removeIf(m -> m.getMenuId() == menuId);
+					removed = true;
+				}
+
+				// 전체 장바구니 총액 다시 계산
+				int total = 0;
+				for (MenuTO m : cart) {
+					total += m.getItemTotal();
+				}
+				boolean empty = cart.isEmpty();
+
+				// 세션에 갱신된 장바구니 저장
+				session.setAttribute("cart", cart);
+
+				// JSON 문자열을 만들어 자바스크립트로 전송
+				String json = String.format(
+						"{\"removed\": %b, \"qty\": %d, \"itemTotal\": %d, \"total\": %d, \"empty\": %b}", removed,
+						newQty, itemTotal, total, empty);
+				resp.getWriter().print(json);
+
+				// ★ 중요: AJAX 요청이므로 여기서 바로 종료 (JSP로 포워딩 안 함)
+				return;
+			}
+
+			// 2. 일반 화면 이동일 경우 (단순히 /cart.do로 접속했을 때)
 			HttpSession session = req.getSession();
 			List<MenuTO> cart = (List<MenuTO>) session.getAttribute("cart");
 			if (cart == null) {
 				cart = new ArrayList<>();
 			}
-			setCartAttr(req, cart);  
+			setCartAttr(req, cart);
 			page = "cart.jsp";
 			break;
 		}
@@ -181,36 +239,85 @@ public class MyDeliveryController extends HttpServlet {
 			setCartAttr(req, cart);
 			page = "cart.jsp";
 			break;
-		}
-		case "/payform.do": {
-			// 1. 세션에서 장바구니 리스트를 꺼내온다.
-			HttpSession session = req.getSession();
-			List<MenuTO> cart = (List<MenuTO>) session.getAttribute("cart");
-			req.setAttribute("cartList", cart);
-			// ??? 총액 계산 로직 필요 (price 합산) ???
-			page = "pay_form.jsp";
-			break;
+
 		}
 		case "/order.do": {
-			// 1. 세션에서 고객 정보와 장바구니를 꺼낸다.
 			HttpSession session = req.getSession();
 			CustomerTO customerTO = (CustomerTO) session.getAttribute("customer");
 			List<MenuTO> cart = (List<MenuTO>) session.getAttribute("cart");
-			// 2. 주문 객체를 만들어 DB에 저장한다.
+			if (cart == null)
+				cart = new ArrayList<>();
+
 			OrderTO order = makeOrder(req, customerTO, cart);
 			System.out.println(order);
-			// ??? OrderDAO 확인 필요 ???
-			// OrderDAO.insert(order);
-			// 3. 장바구니를 비운다.
+			if (cart != null) {
+				setCartAttr(req, cart);
+				req.setAttribute("orderInfo", order);
+			}
+			// DB 저장
+			DeliveryDAO dao = new DeliveryDAO();
+			if (customerTO != null)
+				order.setCustomerNumber(customerTO.getCustomerId());
+			for (MenuTO m : cart) {
+				order.setMenuId(m.getMenuId());
+				order.setSelectedOptions(m.getOptionText());
+				order.setFinalPrice(m.getItemTotal());
+				dao.insertOrder(order);
+			}
+
+			// 화면에 뿌릴 데이터를 먼저 넣고
+			setCartAttr(req, cart);
+			req.setAttribute("order", order);
+			req.setAttribute("customer", customerTO);
+
+			// 그 다음에 비우기
 			session.removeAttribute("cart");
+
 			page = "order.jsp";
 			break;
-
-			// Controller 내부의 주문 처리 부분 예시 MenuDAO menuDAO = new MenuDAO();
-			// int result = menuDAO.insertOrder(order); if (result > 0)
-			// { // result가 1이면 DB 저장 성공! // 주문 완료 화면으로 이동 page = "orderResult.jsp"; }
-			// else { // result가 0이면 저장 실패 // 실패 메시지를 띄우거나 이전 화면으로 돌아감 }
 		}
+		// 주문 목록
+		case "/orderlist.do": {
+			HttpSession session = req.getSession();
+			CustomerTO c = (CustomerTO) session.getAttribute("customer");
+			if (c == null) {
+				page = "login.jsp";
+				break;
+			}
+
+			req.setAttribute("orderList", new DeliveryDAO().getOrderList(c.getCustomerId()));
+			page = "orderList.jsp";
+			break;
+		}
+		// crud
+		// 수정 폼
+		case "/orderedit.do": {
+			int orderId = Integer.parseInt(req.getParameter("orderId"));
+			req.setAttribute("order", new DeliveryDAO().getOrderDetail(orderId));
+			page = "orderEdit.jsp";
+			break;
+		}
+
+		// 수정 처리 (Update)
+		case "/orderupdate.do": {
+			OrderTO to = new OrderTO();
+			to.setOrderId(Integer.parseInt(req.getParameter("orderId")));
+			to.setCustomerAddress(req.getParameter("customerAddress"));
+			to.setCustomerPhone(req.getParameter("customerPhone"));
+
+			new DeliveryDAO().updateOrder(to);
+			resp.sendRedirect("orderlist.do");
+			return; // forward 하면 안 됨
+		}
+
+		// 주문 취소 (Delete)
+		case "/ordercancel.do": {
+			int orderId = Integer.parseInt(req.getParameter("orderId"));
+			new DeliveryDAO().deleteOrder(orderId);
+			resp.sendRedirect("orderlist.do");
+			return;
+		}
+
 		default:
 		}
 		RequestDispatcher rd = req.getRequestDispatcher(page);
@@ -225,16 +332,6 @@ public class MyDeliveryController extends HttpServlet {
 			order.setCustomerAddress(customer.getCustomerAddress());
 			order.setCustomerPhone(customer.getCustomerPhone());
 		}
-		// ??? 장바구니(cart)를 돌면서 selectedOptions, finalPrice 채우는 로직 필요 ???
-		// 예: cart가 여러 개면 selectedOptions는 메뉴 이름들을 이어붙이고, finalPrice는 price 합산
-		// StringBuilder sb = new StringBuilder();
-		// int total = 0;
-		// for (MenuTO menu : cart) {
-		// sb.append(menu.getMenu_name()).append(",");
-		// total += menu.getPrice();
-		// }
-		// order.setSelectedOptions(sb.toString());
-		// order.setFinalPrice(total);
 
 		order.setOrderTime(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date()));
 

@@ -41,7 +41,7 @@
 <nav class="navbar navbar-dark bg-warning mb-4">
     <div class="container-fluid">
         <span class="navbar-brand mb-0 h1 text-dark fw-bold">🛒 장바구니</span>
-        <a href="store.jsp" class="btn btn-outline-dark btn-sm">메뉴 목록으로</a>
+       
     </div>
 </nav>
 
@@ -53,7 +53,7 @@
 <c:choose>
   <c:when test="${empty list}">
     <div class="text-center py-5">
-      <p class="text-muted fs-5 mb-4">장바구니가 비어있습니다</p>
+      <p class="text-muted fs-5 mb-4">장바구니가 비어있습니다.</p>
       <a href="menu.do" class="btn btn-warning fw-bold">메뉴 보러가기</a>
     </div>
   </c:when>
@@ -86,8 +86,8 @@
             <fmt:formatNumber value="${to.itemTotal}"/>원
           </td>
           <td>
-            <a href="#" class="btn btn-sm btn-outline-danger btn-del"
-               data-menuid="${to.menuId}">X</a>
+            <a href="deletecart.do?menuId=${to.menuId}" class="btn btn-sm btn-outline-danger" 
+			onclick="return confirm('삭제할까요?');">X</a>
           </td>
         </tr>
       </c:forEach>

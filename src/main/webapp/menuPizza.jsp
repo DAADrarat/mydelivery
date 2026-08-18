@@ -26,7 +26,7 @@
 <nav class="navbar navbar-dark bg-warning mb-4">
     <div class="container-fluid">
         <span class="navbar-brand mb-0 h1 text-dark fw-bold">🍕 피자</span>
-        <a href="store.do" class="btn btn-outline-dark btn-sm">메뉴 목록으로</a>
+        <a href="menu_choice1.jsp" class="btn btn-outline-dark btn-sm">메뉴 목록으로</a>
     </div>
 </nav>
 
