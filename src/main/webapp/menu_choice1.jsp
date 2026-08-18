@@ -97,12 +97,12 @@
 
 
 		<!-- 카드 2 -->
-		<div class="card menu-card">
+		<a href="menuPizza.jsp" class="card menu-card">
 			<img src="${pageContext.request.contextPath}/img/pizza.jpg" class="menu-img2">
 			<div class="menu-info">
 				<h2>노모어 피자</h2>
 			</div>
-		</div>
+		</a>
 
 
 		<!-- 카드 3 -->
