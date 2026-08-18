@@ -208,3 +208,13 @@ $(function() {
 
             if (res.empty) setTimeout(function() { location.reload(); }, 600);
         })
+        .fail(function() {
+            alert("처리 중 오류가 발생했습니다.");
+        });
+    });
+
+});
+</script>
+
+</body>
+</html>

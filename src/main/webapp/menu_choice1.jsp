@@ -11,7 +11,7 @@
 <style>
 	/* 원래 배경색 적용 */
 	body {
-		background-color: #00FFD0;
+		background-color: #ffc107;
 		font-family: 'Pretendard', '맑은 고딕', sans-serif;
 		padding-bottom: 60px;
 	}
@@ -72,7 +72,7 @@
 		width: 130px;
 		height: 130px;
 		border-radius: 50%;
-		background-color: #f0fdfa;
+		background-color: #fff3cd;
 		
 		display: flex;
 		align-items: center;
@@ -105,7 +105,7 @@
 		display: inline-block;
 		margin-top: 10px;
 		padding: 8px 18px;
-		background-color: #00ffd0;
+		background-color: #ffc107;
 		color: #111111;
 		border-radius: 20px;
 		font-size: 0.85rem;
@@ -114,7 +114,7 @@
 	}
 
 	.menu-card:hover .menu-btn {
-		background-color: #00cbb0;
+		background-color: #fff3cd;
 		color: #ffffff;
 	}
 </style>
@@ -134,7 +134,7 @@
 
 			<!-- 카드 1 : BHC 치킨 -->
 			<div class="col-md-6">
-				<a href="chicken.jsp" class="menu-card">
+				<a href="chicken.do" class="menu-card">
 					<div class="img-box">
 						<img src="${pageContext.request.contextPath}/img/bhc.png" class="menu-img" alt="BHC 치킨">
 					</div>
@@ -145,7 +145,7 @@
 
 			<!-- 카드 2 : 노모어 피자 -->
 			<div class="col-md-6">
-				<a href="menuPizza.jsp" class="menu-card">
+				<a href="pizza.do" class="menu-card">
 					<div class="img-box">
 						<img src="${pageContext.request.contextPath}/img/pizza.jpg" class="menu-img" alt="노모어 피자">
 					</div>
@@ -156,7 +156,7 @@
 
 			<!-- 카드 3 : 엽기 떡볶이 -->
 			<div class="col-md-6">
-				<a href="menuDduck.jsp" class="menu-card">
+				<a href="Dduck.do" class="menu-card">
 					<div class="img-box">
 						<img src="${pageContext.request.contextPath}/img/dduck.png" class="menu-img" alt="엽기 떡볶이">
 					</div>
@@ -167,7 +167,7 @@
 
 			<!-- 카드 4 : 열정 국밥 -->
 			<div class="col-md-6">
-				<a href="gukbap.jsp" class="menu-card">
+				<a href="gukbap.do" class="menu-card">
 					<div class="img-box">
 						<img src="${pageContext.request.contextPath}/img/guk.png" class="menu-img" alt="열정 국밥">
 					</div>
