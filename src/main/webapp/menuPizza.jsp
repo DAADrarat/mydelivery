@@ -1,170 +1,229 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page import="java.util.*" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-
-<%
-	// ===== 화면 확인용 더미데이터 (컨트롤러 완성되면 이 블록 삭제) =====
-	List<Map<String, Object>> dummy = new ArrayList<>();
-	String[] names = { "페퍼로니 피자", "치즈 피자", "불고기 피자", "콤비네이션 피자", "콜라 1.25L" };
-	int[] prices = { 21000, 19000, 23000, 24000, 3000 };
-	boolean[] pizza = { true, true, true, true, false };
-
-	for (int i = 0; i < names.length; i++) {
-		Map<String, Object> m = new HashMap<>();
-		m.put("menuId", i + 1);
-		m.put("menuName", names[i]);
-		m.put("price", prices[i]);
-		m.put("pizza", pizza[i]);
-		dummy.add(m);
-	}
-	request.setAttribute("list", dummy);
-	request.setAttribute("storeName", "피자나라");
-	// ===== 여기까지 삭제 =====
-%>
-
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>메뉴</title>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<title>피자 상세 주문</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <style>
-  table { border-collapse: collapse; width: 850px; }
-  th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-  th { background: #f5f5f5; }
-  input[type=number] { width: 50px; }
-  .opt { text-align: left; font-size: 13px; line-height: 1.9; }
-  .opt label { margin-right: 12px; cursor: pointer; }
-  .final { font-weight: bold; color: #c33; }
+    body { background-color: #f8f9fa; }
+    .menu-card { max-width: 650px; margin: 30px auto; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .option-title { font-weight: bold; color: #495057; margin-top: 15px; border-bottom: 2px solid #e9ecef; padding-bottom: 5px; }
+    .total-price-box { background-color: #fff3cd; border: 1px solid #ffeeba; border-radius: 10px; padding: 15px; }
+
+    #pizzaCarousel { border-radius: 12px; overflow: hidden; }
+    #pizzaCarousel .carousel-inner { height: 350px; }
+    #pizzaCarousel .carousel-item { height: 100%; }
+    #pizzaCarousel .carousel-item img { width: 100%; height: 100% !important; background-color: #e9ecef; object-fit: cover; }
 </style>
 </head>
 <body>
-<h2>${storeName}</h2>
 
-<c:choose>
-  <c:when test="${empty list}">
-    <p>등록된 메뉴가 없습니다.</p>
-    <a href="store.do">가게 목록</a>
-  </c:when>
+<nav class="navbar navbar-dark bg-warning mb-4">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1 text-dark fw-bold">🍕 피자</span>
+        <a href="store.jsp" class="btn btn-outline-dark btn-sm">메뉴 목록으로</a>
+    </div>
+</nav>
 
-  <c:otherwise>
-    <table>
-      <tr>
-        <th>메뉴</th><th>옵션</th><th>수량</th><th>합계</th><th>담기</th>
-      </tr>
-      <c:forEach var="to" items="${list}">
-        <tr class="menu-row" data-price="${to.price}">
-          <td>
-            ${to.menuName}<br>
-            <span style="font-size:12px; color:#888;">
-              <fmt:formatNumber value="${to.price}"/>원
-            </span>
-          </td>
+<div class="container mb-5">
+    <div class="card menu-card p-4 bg-white">
+        <div id="pizzaCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#pizzaCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#pizzaCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#pizzaCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#pizzaCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+            </div>
 
-          <td class="opt">
-            <c:choose>
-              <c:when test="${to.pizza}">
-                <div>
-                  <label><input type="radio" name="size${to.menuId}" class="opt-input"
-                                data-add="0" value="R" checked> 레귤러</label>
-                  <label><input type="radio" name="size${to.menuId}" class="opt-input"
-                                data-add="5000" value="L"> 라지 (+5,000)</label>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="" class="d-block w-100" alt="페퍼로니 피자">
+                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
+                        <h5>페퍼로니 피자</h5>
+                    </div>
                 </div>
-                <div>
-                  <label><input type="radio" name="edge${to.menuId}" class="opt-input"
-                                data-add="0" value="NORMAL" checked> 일반도우</label>
-                  <label><input type="radio" name="edge${to.menuId}" class="opt-input"
-                                data-add="3000" value="CHEESE"> 치즈크러스트 (+3,000)</label>
+                <div class="carousel-item">
+                    <img src="" class="d-block w-100" alt="치즈 피자">
+                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
+                        <h5>치즈 피자</h5>
+                    </div>
                 </div>
-                <div>
-                  <label><input type="checkbox" name="topping" class="opt-input"
-                                data-add="2000" value="CHEESE"> 치즈추가 (+2,000)</label>
-                  <label><input type="checkbox" name="topping" class="opt-input"
-                                data-add="2000" value="PEPPERONI"> 페퍼로니 (+2,000)</label>
-                  <label><input type="checkbox" name="topping" class="opt-input"
-                                data-add="1500" value="POTATO"> 감자 (+1,500)</label>
+                <div class="carousel-item">
+                    <img src="" class="d-block w-100" alt="불고기 피자">
+                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
+                        <h5>불고기 피자</h5>
+                    </div>
                 </div>
-              </c:when>
-              <c:otherwise>-</c:otherwise>
-            </c:choose>
-          </td>
+                <div class="carousel-item">
+                    <img src="" class="d-block w-100" alt="콤비네이션 피자">
+                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
+                        <h5>콤비네이션 피자</h5>
+                    </div>
+                </div>
+            </div>
 
-          <td>
-            <input type="number" class="qty" value="1" min="1" max="99">
-          </td>
+            <button class="carousel-control-prev" type="button" data-bs-target="#pizzaCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#pizzaCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
 
-          <td class="final">
-            <fmt:formatNumber value="${to.price}"/>원
-          </td>
+        <h2 class="fw-bold text-dark">피자 메뉴 선택</h2>
+        <p class="text-muted mb-2">갓 구운 피자!.</p>
+        
+        <h4 class="text-primary fw-bold mb-4">
+            기본 가격: <span id="basePrice">19000</span>원
+        </h4>
 
-          <td>
-            <form action="cart.do" method="post">
-              <input type="hidden" name="cmd" value="add">
-              <input type="hidden" name="menuId" value="${to.menuId}">
-              <input type="hidden" name="qty" class="f-qty" value="1">
-              <input type="hidden" name="size" class="f-size" value="R">
-              <input type="hidden" name="edge" class="f-edge" value="NORMAL">
-              <input type="hidden" name="topping" class="f-topping" value="">
-              <button type="submit">담기</button>
-            </form>
-          </td>
-        </tr>
-      </c:forEach>
-    </table>
+        <form id="orderForm">
+            <input type="hidden" name="menuId" value="${not empty menu.menuId ? menu.menuId : 201}">
 
-    <br>
-    <a href="store.do">가게 목록</a>
-    <a href="cart.do">장바구니 보기</a>
-  </c:otherwise>
-</c:choose>
+            <div class="option-title mb-2">1. 피자 선택 (필수)</div>
+            <div class="form-check mb-2">
+                <input class="form-check-input option-check" type="radio" name="menuOption" id="pizza1" value="0" data-name="페퍼로니 피자" checked>
+                <label class="form-check-label" for="pizza1">페퍼로니 피자 (+0원)</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input option-check" type="radio" name="menuOption" id="pizza2" value="0" data-name="치즈 피자">
+                <label class="form-check-label" for="pizza2">치즈 피자 (+0원)</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input option-check" type="radio" name="menuOption" id="pizza3" value="2000" data-name="불고기 피자">
+                <label class="form-check-label" for="pizza3">불고기 피자 (+2,000원)</label>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input option-check" type="radio" name="menuOption" id="pizza4" value="3000" data-name="콤비네이션 피자">
+                <label class="form-check-label" for="pizza4">콤비네이션 피자 (+3,000원)</label>
+            </div>
 
+            <div class="option-title mb-2">2. 사이즈 선택 (필수)</div>
+            <div class="form-check mb-2">
+                <input class="form-check-input option-check" type="radio" name="sizeOption" id="size1" value="0" data-name="레귤러" checked>
+                <label class="form-check-label" for="size1">레귤러(R) (+0원)</label>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input option-check" type="radio" name="sizeOption" id="size2" value="5000" data-name="라지">
+                <label class="form-check-label" for="size2">라지(L) (+5,000원)</label>
+            </div>
+
+            <div class="option-title mb-2">3. 도우 선택 (필수)</div>
+            <div class="form-check mb-2">
+                <input class="form-check-input option-check" type="radio" name="edgeOption" id="edge1" value="0" data-name="일반도우" checked>
+                <label class="form-check-label" for="edge1">일반도우 (+0원)</label>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input option-check" type="radio" name="edgeOption" id="edge2" value="3000" data-name="치즈크러스트">
+                <label class="form-check-label" for="edge2">치즈크러스트 (+3,000원)</label>
+            </div>
+
+            <div class="option-title mb-2">4. 추가 토핑 (선택)</div>
+            <div class="form-check mb-2">
+                <input class="form-check-input option-check" type="radio" name="toppingOption" id="top0" value="0" data-name="선택안함" checked>
+                <label class="form-check-label" for="top0">선택 안함 (+0원)</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input option-check" type="radio" name="toppingOption" id="top1" value="2000" data-name="치즈추가">
+                <label class="form-check-label" for="top1">치즈 추가 (+2,000원)</label>
+            </div>
+            <div class="form-check mb-4">
+                <input class="form-check-input option-check" type="radio" name="toppingOption" id="top2" value="2000" data-name="페퍼로니추가">
+                <label class="form-check-label" for="top2">페퍼로니 추가 (+2,000원)</label>
+            </div>
+
+            <div class="d-flex align-items-center mb-4">
+                <label for="quantity" class="fw-bold me-3">주문 수량:</label>
+                <input type="number" id="quantity" name="quantity" class="form-control text-center" value="1" min="1" max="10" style="width: 80px;">
+            </div>
+
+            <div class="total-price-box text-center mb-4">
+                <span class="fs-5 text-dark">총 주문 금액: </span>
+                <span id="totalPriceDisplay" class="fs-3 fw-bold text-danger">19,000</span>
+                <span class="fs-5 text-dark">원</span>
+            </div>
+
+            <div>
+                <button type="button" id="btnCart" class="btn btn-warning btn-lg w-100 fw-bold text-dark">
+                    🛒 장바구니 담기
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-$(function() {
+$(document).ready(function() {
 
-    function comma(n) {
-        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
+    function calculateTotalPrice() {
+        let basePrice = parseInt($("#basePrice").text());
+        let optionSum = 0;
 
-    // 한 행의 가격을 다시 계산
-    function calc($row) {
-        var base = parseInt($row.data("price"));
-        var add  = 0;
-
-        // 선택된 옵션의 data-add 합산
-        $row.find(".opt-input:checked").each(function() {
-            add += parseInt($(this).data("add"));
+        $(".option-check:checked").each(function() {
+            optionSum += parseInt($(this).val());
         });
 
-        var qty  = parseInt($row.find(".qty").val()) || 1;
-        var unit = base + add;
+        let quantity = parseInt($("#quantity").val());
+        if (isNaN(quantity) || quantity < 1) {
+            quantity = 1;
+        }
 
-        $row.find(".final").text(comma(unit * qty) + "원");
+        let totalPrice = (basePrice + optionSum) * quantity;
+        $("#totalPriceDisplay").text(totalPrice.toLocaleString());
 
-        // 폼 hidden 값 동기화
-        $row.find(".f-qty").val(qty);
-        $row.find(".f-size").val($row.find("input[name^=size]:checked").val() || "R");
-        $row.find(".f-edge").val($row.find("input[name^=edge]:checked").val() || "NORMAL");
-
-        var tops = [];
-        $row.find("input[name=topping]:checked").each(function() {
-            tops.push($(this).val());
-        });
-        $row.find(".f-topping").val(tops.join(","));
+        return totalPrice;
     }
 
-    // 옵션이나 수량이 바뀌면 그 행만 재계산
-    $(".menu-row").on("change", ".opt-input, .qty", function() {
-        calc($(this).closest(".menu-row"));
+    $(document).on("change", ".option-check, #quantity", function() {
+        calculateTotalPrice();
     });
 
-    // 처음 로드될 때 한 번 계산
-    $(".menu-row").each(function() {
-        calc($(this));
+    function getSelectedOptionString() {
+        let selectedMenu = $("input[name='menuOption']:checked").data("name");
+        let selectedSize = $("input[name='sizeOption']:checked").data("name");
+        let selectedEdge = $("input[name='edgeOption']:checked").data("name");
+        let selectedTopping = $("input[name='toppingOption']:checked").data("name");
+        let quantity = $("#quantity").val();
+
+        let optArr = [selectedMenu, "사이즈: " + selectedSize, "도우: " + selectedEdge];
+        if (selectedTopping && selectedTopping !== "선택안함") {
+            optArr.push("토핑: " + selectedTopping);
+        }
+
+        return optArr.join(" / ") + " (수량: " + quantity + "개)";
+    }
+
+    $("#btnCart").click(function() {
+        let finalPrice = calculateTotalPrice();
+        let selectedOptions = getSelectedOptionString();
+        let menuId = $("input[name='menuId']").val();
+
+        $.ajax({
+            url: "addcart.do",
+            type: "POST",
+            data: {
+                menuId: menuId,
+                selectedOptions: selectedOptions,
+                finalPrice: finalPrice
+            },
+            success: function(response) {
+                location.href = "cart.jsp";
+            },
+            error: function() {
+                location.href = "cart.jsp";
+            }
+        });
     });
 
 });
 </script>
-
 </body>
 </html>
