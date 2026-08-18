@@ -1,0 +1,180 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page import="java.util.*" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+
+<%
+	// ===== 화면 확인용 더미데이터 (컨트롤러 완성되면 이 블록 삭제) =====
+	List<Map<String, Object>> dummy = new ArrayList<>();
+	String[] names = { "페퍼로니 피자", "치즈 피자", "콜라 1.25L" };
+	int[] prices = { 21000, 19000, 3000 };
+	int[] qtys = { 1, 2, 3 };
+
+	int sum = 0;
+	for (int i = 0; i < names.length; i++) {
+		Map<String, Object> m = new HashMap<>();
+		m.put("menuId", i + 1);
+		m.put("menuName", names[i]);
+		m.put("unitPrice", prices[i]);
+		m.put("qty", qtys[i]);
+		m.put("itemTotal", prices[i] * qtys[i]);
+		m.put("optionText", "");
+		dummy.add(m);
+		sum += prices[i] * qtys[i];
+	}
+	request.setAttribute("list", dummy);
+	request.setAttribute("total", sum);
+	// ===== 여기까지 삭제 =====
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>장바구니</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<style>
+  table { border-collapse: collapse; width: 700px; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+  th { background: #f5f5f5; }
+  .btn-qty {
+    width: 24px; height: 24px; cursor: pointer;
+    border: 1px solid #bbb; background: #fff;
+  }
+  .btn-del { cursor: pointer; color: #c00; text-decoration: none; }
+  .opt { font-size: 12px; color: #888; }
+  #msg {
+    display: none; margin: 10px 0; padding: 8px;
+    background: #eef7ee; border: 1px solid #cbe3cb; width: 682px;
+  }
+</style>
+</head>
+<body>
+<h2>장바구니</h2>
+
+<div id="msg"></div>
+
+<div id="cart-area">
+<c:choose>
+  <c:when test="${empty list}">
+    <p>장바구니가 비어있습니다.</p>
+    <a href="menu.do">메뉴 보러가기</a>
+  </c:when>
+
+  <c:otherwise>
+    <table>
+      <tr>
+        <th>메뉴</th><th>단가</th><th>수량</th><th>금액</th><th>삭제</th>
+      </tr>
+      <c:forEach var="to" items="${list}">
+        <tr id="row-${to.menuId}">
+          <td>
+            ${to.menuName}
+            <c:if test="${not empty to.optionText}">
+              <br><span class="opt">${to.optionText}</span>
+            </c:if>
+          </td>
+          <td><fmt:formatNumber value="${to.unitPrice}"/>원</td>
+          <td>
+            <button type="button" class="btn-qty"
+                    data-menuid="${to.menuId}" data-delta="-1">-</button>
+            <span id="qty-${to.menuId}">${to.qty}</span>
+            <button type="button" class="btn-qty"
+                    data-menuid="${to.menuId}" data-delta="1">+</button>
+          </td>
+          <td id="item-${to.menuId}"><fmt:formatNumber value="${to.itemTotal}"/>원</td>
+          <td>
+            <a href="#" class="btn-del" data-menuid="${to.menuId}">X</a>
+          </td>
+        </tr>
+      </c:forEach>
+      <tr>
+        <td colspan="3"><b>총 금액</b></td>
+        <td colspan="2"><b id="grand-total"><fmt:formatNumber value="${total}"/>원</b></td>
+      </tr>
+    </table>
+
+    <br>
+    <a href="menu.do">계속 쇼핑</a>
+    <a href="order.do?cmd=form">주문하기</a>
+    
+  </c:otherwise>
+</c:choose>
+</div>
+
+<script>
+$(function() {
+
+    // 숫자 3자리 콤마
+    function comma(n) {
+        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function showMsg(text) {
+        $("#msg").text(text).fadeIn(150).delay(1200).fadeOut(400);
+    }
+
+    // ===== 수량 변경 =====
+    $(document).on("click", ".btn-qty", function() {
+        var menuId = $(this).data("menuid");
+        var delta  = $(this).data("delta");
+        var cur    = parseInt($("#qty-" + menuId).text());
+        var qty    = cur + delta;
+
+        if (qty < 1) {
+            if (!confirm("수량이 0이 됩니다. 삭제할까요?")) return;
+        }
+
+        $.ajax({
+            url: "cart.do",
+            type: "post",
+            data: { cmd: "update", menuId: menuId, qty: qty },
+            dataType: "json"
+        })
+        .done(function(res) {
+            if (res.removed) {
+                $("#row-" + menuId).fadeOut(200, function() { $(this).remove(); });
+                showMsg("삭제되었습니다.");
+            } else {
+                $("#qty-" + menuId).text(res.qty);
+                $("#item-" + menuId).text(comma(res.itemTotal) + "원");
+            }
+            $("#grand-total").text(comma(res.total) + "원");
+
+            if (res.empty) location.reload();   // 다 비면 "비어있습니다" 화면으로
+        })
+        .fail(function() {
+            alert("처리 중 오류가 발생했습니다.");
+        });
+    });
+
+    // ===== 삭제 =====
+    $(document).on("click", ".btn-del", function(e) {
+        e.preventDefault();
+        if (!confirm("삭제할까요?")) return;
+
+        var menuId = $(this).data("menuid");
+
+        $.ajax({
+            url: "cart.do",
+            type: "post",
+            data: { cmd: "delete", menuId: menuId },
+            dataType: "json"
+        })
+        .done(function(res) {
+            $("#row-" + menuId).fadeOut(200, function() { $(this).remove(); });
+            $("#grand-total").text(comma(res.total) + "원");
+            showMsg("삭제되었습니다.");
+
+            if (res.empty) setTimeout(function() { location.reload(); }, 600);
+        })
+        .fail(function() {
+            alert("처리 중 오류가 발생했습니다.");
+        });
+    });
+
+});
+</script>
+
+</body>
+</html>
