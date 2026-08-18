@@ -138,7 +138,7 @@ protected void service(HttpServletRequest req, HttpServletResponse resp) throws 
 				page = "pay_form.jsp";
 				break;
 			}
-			case "/pay.do" : {
+			case "/order.do" : {
 				//1. 세션에서 고객 정보와 장바구니를 꺼낸다.
 				HttpSession session = req.getSession();
 				CustomerTO customerTO = (CustomerTO) session.getAttribute("customer");
@@ -150,8 +150,14 @@ protected void service(HttpServletRequest req, HttpServletResponse resp) throws 
 				// OrderDAO.insert(order);
 				//3. 장바구니를 비운다.
 				session.removeAttribute("cart");
-				page = "pay_complete.jsp";
+				page = "order.jsp";
 				break;
+				
+				
+				// Controller 내부의 주문 처리 부분 예시 MenuDAO menuDAO = new MenuDAO(); 
+				//int result = menuDAO.insertOrder(order); if (result > 0) 
+				//{ // result가 1이면 DB 저장 성공! // 주문 완료 화면으로 이동 page = "orderResult.jsp"; }
+				// else { // result가 0이면 저장 실패 // 실패 메시지를 띄우거나 이전 화면으로 돌아감 }
 			}
 			default:
 		}
@@ -159,13 +165,14 @@ protected void service(HttpServletRequest req, HttpServletResponse resp) throws 
 		rd.forward(req, resp);
 	}
 
+
 	OrderTO makeOrder(HttpServletRequest req, CustomerTO customer, List<MenuTO> cart) {
 		OrderTO order = new OrderTO();
 		if (customer != null) {
-			order.setCustomerNumber(customer.getCustNum());
-			order.setCustomerName(customer.getCustName());
-			order.setCustomerAddress(customer.getCustAddr());
-			order.setCustomerPhone(customer.getCustPhone());
+		
+			order.setCustomerName(customer.getCustomerName());
+			order.setCustomerAddress(customer.getCustomerAddress());
+			order.setCustomerPhone(customer.getCustomerPhone());
 		}
 		// ??? 장바구니(cart)를 돌면서 selectedOptions, finalPrice 채우는 로직 필요 ???
 		// 예: cart가 여러 개면 selectedOptions는 메뉴 이름들을 이어붙이고, finalPrice는 price 합산
