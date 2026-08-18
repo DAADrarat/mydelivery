@@ -42,25 +42,25 @@
 
             <div class="carousel-inner">
                 <div class="carousel-item active">
-                    <img src="" class="d-block w-100" alt="엽기 떡볶이">
+                    <img src="https://nyumbucket.s3.ap-northeast-2.amazonaws.com/restaurant/79bcad02-5890-4306-80b1-b92092817cdc" class="d-block w-100" alt="엽기 떡볶이">
                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
                         <h5>엽기 떡볶이</h5>
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <img src="" class="d-block w-100" alt="로제 떡볶이">
+                    <img src="https://www.yupdduk.com/bod/config/menu/%EB%A1%9C%EC%A0%9C%EB%A9%94%EB%89%B4_5_1_1_1_1_1_1_2_1_1_1_1_1_1_1_1_1_1_1.png" class="d-block w-100" alt="로제 떡볶이">
                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
                         <h5>로제 떡볶이</h5>
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <img src="" class="d-block w-100" alt="마라 떡볶이">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsOse4777KGPX5JW3g5vUoex1WFwYHDZ7G2Y2XXD0REg&s=10" class="d-block w-100" alt="마라 떡볶이">
                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
                         <h5>마라 떡볶이</h5>
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <img src="" class="d-block w-100" alt="마라로제 떡볶이">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROOMJcnCmlCCUH2uiYhVZGbH8J9yEw8lHTSINATEaC8Q&s=10" class="d-block w-100" alt="마라로제 떡볶이">
                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
                         <h5>마라로제 떡볶이</h5>
                     </div>

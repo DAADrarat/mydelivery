@@ -54,6 +54,11 @@ protected void service(HttpServletRequest req, HttpServletResponse resp) throws 
 				break;
 			}
 			
+			case "/chicken.do" : { page = "chicken.jsp"; break; }
+			case "/pizza.do"   : { page = "menuPizza.jsp"; break; }
+			case "/Dduck.do"   : { page = "menuDduck.jsp"; break; }
+			case "/gukbap.do"  : { page = "gukbap.jsp"; break; }
+			
 			case"/store.do" : {
 				//List<MenuTO> list = MenuDAO.getList(); menuto객체를 여러개 담는 List 컨트롤러가 menudao에게 메뉴 목록을 가져오라고 요청하는거
 				//req.setAttribute("data", list); jsp로 전달하는 역할, request객체에 data라는 이름으로 list를 저장

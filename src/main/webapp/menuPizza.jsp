@@ -42,25 +42,25 @@
 
             <div class="carousel-inner">
                 <div class="carousel-item active">
-                    <img src="" class="d-block w-100" alt="페퍼로니 피자">
+                    <img src="https://www.반올림김천혁신.kr/images/1024.png" class="d-block w-100" alt="페퍼로니 피자">
                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
                         <h5>페퍼로니 피자</h5>
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <img src="" class="d-block w-100" alt="치즈 피자">
+                    <img src="https://cdn.dominos.co.kr/admin/upload/goods/20200311_TI57KvOH.jpg" class="d-block w-100" alt="치즈 피자">
                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
                         <h5>치즈 피자</h5>
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <img src="" class="d-block w-100" alt="불고기 피자">
+                    <img src="https://cdn.dominos.co.kr/admin/upload/goods/20200508_gH22my39.jpg" class="d-block w-100" alt="불고기 피자">
                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
                         <h5>불고기 피자</h5>
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <img src="" class="d-block w-100" alt="콤비네이션 피자">
+                    <img src="https://img1.kakaocdn.net/thumb/C305x305@2x.fwebp.q82/?fname=https%3A%2F%2Fst.kakaocdn.net%2Fproduct%2Fgift%2Fproduct%2F20241203154528_d4d0f4e18ab646cebd8c1141edaf97d4.jpg" class="d-block w-100" alt="콤비네이션 피자">
                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
                         <h5>콤비네이션 피자</h5>
                     </div>

@@ -153,16 +153,12 @@
             </div>
 
             <div class="row g-2">
-                <div class="col-6">
+                <div class="col-12">
                     <button type="button" id="btnCart" class="btn btn-outline-warning btn-lg w-100 fw-bold text-dark">
                         🛒 장바구니 담기
                     </button>
                 </div>
-                <div class="col-6">
-                    <button type="button" id="btnOrder" class="btn btn-warning btn-lg w-100 fw-bold text-dark">
-                        🚀 바로 주문하기
-                    </button>
-                </div>
+
             </div>
         </form>
     </div>
