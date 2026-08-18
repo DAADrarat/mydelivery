@@ -32,75 +32,115 @@
 <head>
 <meta charset="UTF-8">
 <title>장바구니</title>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <style>
-  table { border-collapse: collapse; width: 700px; }
-  th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-  th { background: #f5f5f5; }
+  body { background-color: #f8f9fa; }
+  .cart-wrap {
+    max-width: 900px; margin: 30px auto; padding: 25px;
+    background: #fff; border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+  .table thead th {
+    background-color: #ffc107;
+    color: #212529;
+  }
   .btn-qty {
-    width: 24px; height: 24px; cursor: pointer;
-    border: 1px solid #bbb; background: #fff;
+    width: 28px; height: 28px; padding: 0;
+    line-height: 1; font-weight: bold;
   }
-  .btn-del { cursor: pointer; color: #c00; text-decoration: none; }
   .opt { font-size: 12px; color: #888; }
-  #msg {
-    display: none; margin: 10px 0; padding: 8px;
-    background: #eef7ee; border: 1px solid #cbe3cb; width: 682px;
+  .total-price-box {
+    background-color: #fff3cd; border: 1px solid #ffeeba;
+    border-radius: 10px; padding: 15px;
   }
+  #msg { display: none; }
 </style>
 </head>
 <body>
-<h2>장바구니</h2>
 
-<div id="msg"></div>
+<nav class="navbar navbar-dark bg-warning mb-4">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1 text-dark fw-bold">🛒 장바구니</span>
+        <a href="store.jsp" class="btn btn-outline-dark btn-sm">메뉴 목록으로</a>
+    </div>
+</nav>
+
+<div class="cart-wrap">
+
+<div id="msg" class="alert alert-success py-2"></div>
 
 <div id="cart-area">
 <c:choose>
   <c:when test="${empty list}">
-    <p>장바구니가 비어있습니다.</p>
-    <a href="menu.do">메뉴 보러가기</a>
+    <div class="text-center py-5">
+      <p class="text-muted fs-5 mb-4">장바구니가 비어있습니다.</p>
+      <a href="menu.do" class="btn btn-warning fw-bold">메뉴 보러가기</a>
+    </div>
   </c:when>
 
   <c:otherwise>
-    <table>
-      <tr>
-        <th>메뉴</th><th>단가</th><th>수량</th><th>금액</th><th>삭제</th>
-      </tr>
+    <table class="table table-bordered align-middle text-center">
+      <thead>
+        <tr>
+          <th>메뉴</th><th style="width:150px;">수량</th>
+          <th style="width:130px;">금액</th><th style="width:80px;">삭제</th>
+        </tr>
+      </thead>
+      <tbody>
       <c:forEach var="to" items="${list}">
         <tr id="row-${to.menuId}">
-          <td>
-            ${to.menuName}
+          <td class="text-start">
+            <span class="fw-bold">${to.menuName}</span>
             <c:if test="${not empty to.optionText}">
               <br><span class="opt">${to.optionText}</span>
             </c:if>
           </td>
-          <td><fmt:formatNumber value="${to.unitPrice}"/>원</td>
           <td>
-            <button type="button" class="btn-qty"
+            <button type="button" class="btn btn-outline-secondary btn-sm btn-qty"
                     data-menuid="${to.menuId}" data-delta="-1">-</button>
-            <span id="qty-${to.menuId}">${to.qty}</span>
-            <button type="button" class="btn-qty"
+            <span id="qty-${to.menuId}" class="mx-2">${to.qty}</span>
+            <button type="button" class="btn btn-outline-secondary btn-sm btn-qty"
                     data-menuid="${to.menuId}" data-delta="1">+</button>
           </td>
-          <td id="item-${to.menuId}"><fmt:formatNumber value="${to.itemTotal}"/>원</td>
+          <td id="item-${to.menuId}" class="fw-bold text-danger">
+            <fmt:formatNumber value="${to.itemTotal}"/>원
+          </td>
           <td>
-            <a href="#" class="btn-del" data-menuid="${to.menuId}">X</a>
+            <a href="#" class="btn btn-sm btn-outline-danger btn-del"
+               data-menuid="${to.menuId}">X</a>
           </td>
         </tr>
       </c:forEach>
-      <tr>
-        <td colspan="3"><b>총 금액</b></td>
-        <td colspan="2"><b id="grand-total"><fmt:formatNumber value="${total}"/>원</b></td>
-      </tr>
+      </tbody>
     </table>
 
-    <br>
-    <a href="menu.do">계속 쇼핑</a>
-    <a href="order.do?cmd=form">주문하기</a>
-    
+    <div class="total-price-box text-center mb-4">
+      <span class="fs-5 text-dark">총 결제금액: </span>
+      <span id="grand-total" class="fs-3 fw-bold text-danger">
+        <fmt:formatNumber value="${total}"/>원
+      </span>
+    </div>
+
+    <div class="row g-2">
+      <div class="col-6">
+        <a href="menu.do?storeId=2"
+           class="btn btn-outline-warning btn-lg w-100 fw-bold text-dark">계속 쇼핑</a>
+      </div>
+      <div class="col-6">
+        <a href="order.do?cmd=form"
+           class="btn btn-warning btn-lg w-100 fw-bold text-dark">🚀 주문하기</a>
+      </div>
+    </div>
   </c:otherwise>
 </c:choose>
 </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 $(function() {
@@ -168,13 +208,3 @@ $(function() {
 
             if (res.empty) setTimeout(function() { location.reload(); }, 600);
         })
-        .fail(function() {
-            alert("처리 중 오류가 발생했습니다.");
-        });
-    });
-
-});
-</script>
-
-</body>
-</html>
