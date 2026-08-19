@@ -47,9 +47,9 @@ public class MyDeliveryController extends HttpServlet {
 			break;
 		}
 		case "/logout.do": {
-			HttpSession session = req.getSession(false); // =req.getSession(false): 세션이 이미 있으면 가져오고 없으면 null
+			HttpSession session = req.getSession(false);             // =req.getSession(false): 세션이 이미 있으면 가져오고 없으면 null
 			if (session != null)
-				session.invalidate(); // session이 존재한다면 session을 삭제해라
+				session.invalidate();                                 // session이 존재한다면 session을 삭제해라
 			page = "login.jsp";
 
 			break;
@@ -284,7 +284,6 @@ public class MyDeliveryController extends HttpServlet {
 				page = "login.jsp";
 				break;
 			}
-
 			req.setAttribute("orderList", new DeliveryDAO().getOrderList(c.getCustomerNumber()));
 			page = "orderList.jsp";
 			break;
@@ -307,7 +306,7 @@ public class MyDeliveryController extends HttpServlet {
 
 			new DeliveryDAO().updateOrder(to);
 			resp.sendRedirect("orderlist.do");
-			return; // forward 하면 안 됨
+			return;                                           // forward 하면 안 됨
 		}
 
 		// 주문 취소 (Delete)

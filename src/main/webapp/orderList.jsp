@@ -43,6 +43,7 @@
           <th>주문 내용</th>
           <th style="width:110px;">금액</th>
           <th>배송지</th>
+          <th style="width:130px;">연락처</th>  
           <th style="width:130px;">관리</th>
         </tr>
       </thead>
@@ -55,6 +56,7 @@
               <fmt:formatNumber value="${to.finalPrice}"/>원
             </td>
             <td class="text-start">${to.customerAddress}</td>
+            <td>${to.customerPhone}</td> 
             <td>
               <a href="orderedit.do?orderId=${to.orderId}"
                  class="btn btn-sm btn-outline-primary">수정</a>
