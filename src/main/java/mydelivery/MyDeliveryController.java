@@ -257,7 +257,7 @@ public class MyDeliveryController extends HttpServlet {
 			// DB 저장
 			DeliveryDAO dao = new DeliveryDAO();
 			if (customerTO != null)
-				order.setCustomerNumber(customerTO.getCustomerId());
+				order.setCustomerNumber(customerTO. getCustomerNumber());
 			for (MenuTO m : cart) {
 				order.setMenuId(m.getMenuId());
 				order.setSelectedOptions(m.getOptionText());
@@ -285,7 +285,7 @@ public class MyDeliveryController extends HttpServlet {
 				break;
 			}
 
-			req.setAttribute("orderList", new DeliveryDAO().getOrderList(c.getCustomerId()));
+			req.setAttribute("orderList", new DeliveryDAO().getOrderList(c.getCustomerNumber()));
 			page = "orderList.jsp";
 			break;
 		}

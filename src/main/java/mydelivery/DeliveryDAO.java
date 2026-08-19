@@ -23,8 +23,8 @@ public class DeliveryDAO {
             try (ResultSet rs = psmt.executeQuery()) { 
                 if (rs.next()) {
                     customer = new CustomerTO(); 
-                    customer.setCustomerId(rs.getInt("customer_number"));
-                    customer.setUserId(rs.getString("customer_id"));      
+                    customer.setCustomerNumber(rs.getInt("customer_number"));
+                    customer.setCustomerId(rs.getString("customer_id"));      
                     customer.setPasswd(rs.getString("customer_pw"));      
                     customer.setCustomerName(rs.getString("customer_name")); 
                     customer.setCustomerAddress(rs.getString("customer_address"));
@@ -186,16 +186,16 @@ public class DeliveryDAO {
             psmt.setInt(1, customerNumber);
             try (ResultSet rs = psmt.executeQuery()) {
                 while (rs.next()) {
-                    OrderTO to = new OrderTO();
-                    to.setOrderId(rs.getInt("order_id"));
-                    to.setMenuId(rs.getInt("menu_id"));
-                    to.setSelectedOptions(rs.getString("selected_options"));
-                    to.setFinalPrice(rs.getInt("final_price"));
-                    to.setOrderTime(rs.getString("order_time"));
-                    to.setCustomerName(rs.getString("customer_name"));
-                    to.setCustomerAddress(rs.getString("customer_address"));
-                    to.setCustomerPhone(rs.getString("customer_phone"));
-                    list.add(to);
+                    OrderTO order = new OrderTO();
+                    order.setOrderId(rs.getInt("order_id"));
+                    order.setMenuId(rs.getInt("menu_id"));
+                    order.setSelectedOptions(rs.getString("selected_options"));
+                    order.setFinalPrice(rs.getInt("final_price"));
+                    order.setOrderTime(rs.getString("order_time"));
+                    order.setCustomerName(rs.getString("customer_name"));
+                    order.setCustomerAddress(rs.getString("customer_address"));
+                    order.setCustomerPhone(rs.getString("customer_phone"));
+                    list.add(order);
                 }
             }
         } catch (Exception e) {
@@ -223,4 +223,3 @@ public class DeliveryDAO {
         return result;
     }
 }
-

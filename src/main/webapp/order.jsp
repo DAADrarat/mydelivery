@@ -32,44 +32,21 @@ body {
 
 .check-circle {
 	width: 90px;
-	height: 90px;
-	margin: 0 auto 20px;
-	background: #ffc107;
-	border-radius: 50%;
+	height: 90px; /* 가로세로 같게 → 정사각형 */
+	border-radius: 50%; /* ← 이게 동그라미로 만드는 핵심 */
+	background: #ffc107; /* 노란 배경 */
 	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 48px;
-	animation: pop 0.5s ease-out;
+	align-items: center; /* 세로 가운데 */
+	justify-content: center; /* 가로 가운데 */
+	font-size: 48px; /* ✓ 크기 */
+	margin: 0 auto 20px; /* 좌우 auto = 화면 중앙 정렬 */
+	animation: pop 0.5s ease-out; /* 뿅 하고 나타나는 효과 */
 }
 
-@
-keyframes pop { 0% {
-	transform: scale(0);
-	opacity: 0;
-}
-
-70
-%
-{
-transform
-:
-scale(
-1.15
-);
-opacity
-:
-1;
-}
-100
-%
-{
-transform
-:
-scale(
-1
-);
-}
+@keyframes pop {
+  0%   { transform: scale(0);    opacity: 0; }
+  70%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
 }
 .info-title {
 	font-weight: bold;

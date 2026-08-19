@@ -20,7 +20,7 @@ integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="ano
 <body>
 
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
-    <div class="card login-card" style="width: 380px;">
+    <div class="card login-card" style="width: 500px;">
         <div class="card-body p-4">
 
             <div class="logo-circle">
